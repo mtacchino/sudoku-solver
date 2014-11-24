@@ -1,6 +1,17 @@
 package me.tacchino.sudoku;
 import java.util.ArrayList;
 
+/* Class representing a sudoku digit
+ *
+ * Author: Matt Tacchino
+ *
+ * A sudoku digit is a digit from 1 to 9,
+ * or an array of possible values. A digit can
+ * can also be "safe" if it was an original input.
+ * Original inputs should never be changed after they
+ * are set
+ * 
+ */
 public class SudokuDigit {
 	private int answer;
 	private int xLocation;
@@ -70,19 +81,19 @@ public class SudokuDigit {
 	}
 	
 	public void setAnswer(int answer){
-		this.answer = answer;
-		possibleValues.clear();
-		if (answer == 0) { // add all possible values from 1 to 9
-			for (int i = 1; i < 10; i ++){
-				this.possibleValues.add(i);
+			this.answer = answer;
+			possibleValues.clear();
+			if (answer == 0) { // add all possible values from 1 to 9
+				for (int i = 1; i < 10; i ++){
+					this.possibleValues.add(i);
+				}
 			}
-		}
 	}
 
 	public void removePossibleValue(int possibleValue){
 		if (answer == 0) {
 			if (possibleValues.contains(possibleValue)){
-				possibleValues.remove((Integer)possibleValue);
+				possibleValues.remove(possibleValue);
 				if (possibleValues.size() == 1){
 					setAnswer(possibleValues.get(0));
 				}

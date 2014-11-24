@@ -11,10 +11,25 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
+/* Class representing the GUI
+ * 
+ * Author: Matt Tacchino
+ * 
+ * Creates the interactive GUI to support the sudoku solver using GridBagLayout.
+ * GUI is minimum 300x300px resizable
+ * 
+ * There are 5 main parts:
+ * 		Title
+ * 		Grid: 9x9 grid of text fields, 81 total
+ * 		Generate Example button: creates an example puzzle using the ExamplePuzzles class
+ * 		Clear Table button: set sudokutable to a blank table and clear text fields
+ * 		Solve button: Solves the sudoku puzzle. See SudokuTable.java for algorithm
+ * 
+ */
 public class GUI {
 
 	private SudokuTable sudokuTable = new SudokuTable();
@@ -28,29 +43,33 @@ public class GUI {
 		for (int y = 0; y < 9; y++){
 			for (int x = 0; x < 9; x++){
 				textField[x][y] = new JTextField();
+				textField[x][y].setForeground(Color.RED);
 				gridPanel.add(textField[x][y]);
 			}
 		}
 	}
 
-	public void sudokuTableToGUI(){
+	public void GUIToSudokuTable(){
 		for (int y = 0; y < 9; y++){
 			for (int x = 0; x < 9; x++){
 				if (!textField[x][y].getText().equals("")){
 					sudokuTable.getTable()[x][y].setAnswer(Integer.parseInt(textField[x][y].getText())); //if a number is in the textfield, put it in the sudoku table
+					sudokuTable.getTable()[x][y].setSafe(true); // set starting digits to true
+					textField[x][y].setForeground(Color.RED); // colour starting digits red
 				}
 				else {
-					if (sudokuTable.getTable()[x][y].isSolved()){
-						if (sudokuTable.getTable()[x][y].isSafe()) //set safe inputs to be coloured red
-							textField[x][y].setForeground(Color.RED);
-						else
-							textField[x][y].setForeground(Color.BLACK);
-						textField[x][y].setText(String.valueOf(sudokuTable.getTable()[x][y].getAnswer()));
-					}
-					else
-						textField[x][y].setText(""); //clear any text if the digit is not solved
-					
+					sudokuTable.getTable()[x][y].setAnswer(0); //clear any blank table digits by setting them to 0
+					textField[x][y].setForeground(Color.BLACK); //colour blanks to black
 				}
+			}
+		}
+	}
+	
+	public void sudokuTableToGUI(){
+		for (int y = 0; y < 9; y++){
+			for (int x = 0; x < 9; x++){		
+				if (sudokuTable.getTable()[x][y].isSolved())
+					textField[x][y].setText(String.valueOf(sudokuTable.getTable()[x][y].getAnswer()));			
 			}
 		}
 	}
@@ -59,14 +78,12 @@ public class GUI {
 		for (int y = 0; y < 9; y++){
 			for (int x = 0; x < 9; x++){
 				textField[x][y].setText("");
+				textField[x][y].setForeground(Color.RED);
 			}
 		}
 	}
 	
 	public void createGUI(){
-		//sudokuTableToGUI();
-		
-		///////////////////////////////////////////////////////////
 		//create main panel and add a top title and bottom button. Also
 		//add the grid panel to this panel in the centre
 		JPanel mainPanel = new JPanel(new GridBagLayout()); //create main panel
@@ -116,7 +133,6 @@ public class GUI {
 				ExamplePuzzles example = new ExamplePuzzles();
 				sudokuTable = example.createExamplePuzzle();
 				clearGrid();
-				System.out.println(sudokuTable.toString());
 				sudokuTableToGUI();
 			}
 		});
@@ -132,7 +148,6 @@ public class GUI {
 			public void actionPerformed(ActionEvent e){
 				sudokuTable = new SudokuTable();
 				clearGrid();
-				sudokuTableToGUI();
 			}
 		});
 		
@@ -144,10 +159,13 @@ public class GUI {
 		mainPanel.add(solveButton, gridBagConstraints);
 		solveButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				sudokuTableToGUI();
-				sudokuTable.checkAll(true); // do a safe checkAll before finding all remaining solutions
-				sudokuTable.solve(1);
-				sudokuTableToGUI();
+				GUIToSudokuTable();
+				if (!sudokuTable.checkOK())
+					JOptionPane.showMessageDialog(frame,"Invalid input. Puzzle cannot be solved.","Error",JOptionPane.ERROR_MESSAGE);
+				else if (!sudokuTable.solve(1))
+					JOptionPane.showMessageDialog(frame,"This puzzle cannot be solved.","Error",JOptionPane.ERROR_MESSAGE);
+				else
+					sudokuTableToGUI();
 			}
 		});
 		

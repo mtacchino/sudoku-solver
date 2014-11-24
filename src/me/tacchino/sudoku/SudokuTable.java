@@ -1,6 +1,16 @@
 package me.tacchino.sudoku;
 import java.util.ArrayList;
 
+/* Class representing a sudoku table
+ * 
+ * Author: Matt Tacchino
+ *
+ * A sudoku table is a 9x9 matrix, containing 81
+ * sudoku digits.
+ * 
+ * Also contains method for solving the table
+ * 
+ */
 public class SudokuTable {
 	
 	private SudokuDigit[][] table = new SudokuDigit[9][9];
@@ -21,14 +31,17 @@ public class SudokuTable {
 	
 	
 	boolean checkDigit(SudokuDigit digit) {
+		if (!digit.isSolved())
+			return true; // return true if the digit is not solved
+		
 		 //check row
         for (int x = 0; x < 9; x++)
-            if (digit.getAnswer() == table[x][digit.getYLocation()].getAnswer())
+            if (digit.getAnswer() == table[x][digit.getYLocation()].getAnswer() && digit.getXLocation() != x)
                 return false;
 
         //check column
         for (int y = 0; y < 9; y++) 
-            if (digit.getAnswer() == table[digit.getXLocation()][y].getAnswer())
+            if (digit.getAnswer() == table[digit.getXLocation()][y].getAnswer() && digit.getYLocation() != y)
                 return false;
 
         //check quadrant
@@ -36,7 +49,7 @@ public class SudokuTable {
 		int startPosY = (digit.getYLocation()/3)*3;
 		for (int y = startPosY; y < startPosY + 3; y++){
 			for (int x = startPosX; x < startPosX + 3; x++){
-				if (digit.getAnswer() == table[x][y].getAnswer())
+				if (digit.getAnswer() == table[x][y].getAnswer() && digit.getXLocation() != x && digit.getYLocation() != y)
 					return false;
 			}
 		}
@@ -69,46 +82,6 @@ public class SudokuTable {
 	}
 	
 	
-	/*boolean solve(int position) {
-		if (position == 81)
-        	return true;
-		
-		int x = (position-1)%9;
-		int y = (position-1)/9;
-		
-        if (table[x][y].isSolved())
-        	return solve(position+1);
-        
-        for (int d = 1; d <= 9; d++) {
-        	SudokuDigit digit = new SudokuDigit(table[x][y]);
-        	digit.setAnswer(d);
-		    if (checkDigit(digit)) {
-		        table[x][y] = digit;
-		       	if (solve(position+1))
-		       		return true;
-		    }
-        }
-        table[x][y].setAnswer(0); // reset on backtrack
-        return false;
-    }*/
-	
-	
-	
-	
-	
-	
-	
-	//the position of a sudokuDigit is an integer from 1 to 81, counting left to right, then top to bottom
-	//1  2  3  .. 9
-	//10 11 12 .. 18
-	//19 20 21 .. 27
-	//.  .  .  .. .
-	//73 74 75 .. 81
-	public SudokuDigit getSudokuDigit(int position){
-		return table[(position-1) % 9][(position-1) / 9];
-	}
-	
-	
 	//returns an int (from 0 to 81) representing the number of digits that are solved in the table 
 	public int getNumOfDigitsSolved(){
 		int numOfDigitsSolved = 0;
@@ -121,95 +94,28 @@ public class SudokuTable {
 		return numOfDigitsSolved;
 	}
 	
-	// checks for solved digits in a 3x3 quadrant. Removes all the possible values of a sudokuDigit for solved digits
-	// if parameter isSafe=TRUE, sets any solved digits to isSafe=TRUE
-	// return false if the check removes all possible values without getting an answer
-	public boolean checkQuadrant(SudokuDigit sudokuDigit, boolean isSafe){
-					
-		int startPosX = (sudokuDigit.getXLocation()/3)*3;
-		int startPosY = (sudokuDigit.getYLocation()/3)*3;
-
-		for (int y = startPosY; y < startPosY + 3; y++){
-			for (int x = startPosX; x < startPosX + 3; x++){
-				if (sudokuDigit.getXLocation() != x && sudokuDigit.getYLocation() != y){
-					if (table[x][y].isSolved())
-						sudokuDigit.removePossibleValue(table[x][y].getAnswer());
-					if (sudokuDigit.isSolved() && sudokuDigit.getAnswer() == table[x][y].getAnswer())
-						return true;
-				}
-				if (sudokuDigit.isSolved() && isSafe)
+	// checks that the table input is valid. All digits must be from 0 to 9
+	// and rows, columns and quadrants cannot have the same digits
+	public boolean checkOK(){
+		for (SudokuDigit[] column : table){
+			for (SudokuDigit sudokuDigit : column){
+				if (checkDigit(sudokuDigit) && sudokuDigit.getAnswer() >= 0 && sudokuDigit.getAnswer() <= 9)
+					continue;
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	//sets all solved digits to safe. this will also show them as red
+	public void setSolvedToSafe(){
+		for (SudokuDigit[] column : table){
+			for (SudokuDigit sudokuDigit : column){
+				if (sudokuDigit.isSolved())
 					sudokuDigit.setSafe(true);
 			}
 		}
-		return false;
 	}
-	
-	// checks for solved digits in a row. Removes all the possible values of a sudokuDigit for solved digits
-	// if parameter isSafe=TRUE, sets any solved digits to isSafe=TRUE
-	// return false if the check removes all possible values without getting an answer
-	public boolean checkRow(SudokuDigit sudokuDigit, boolean isSafe){
-		
-		int y = sudokuDigit.getYLocation();			
-		for (int x = 0; x < 9; x++){
-			if (sudokuDigit.getXLocation() != x){
-				if (table[x][y].isSolved()){
-					sudokuDigit.removePossibleValue(table[x][y].getAnswer());
-					if (sudokuDigit.isSolved() && sudokuDigit.getAnswer() == table[x][y].getAnswer())
-						return true;
-				}
-				if (sudokuDigit.isSolved() && isSafe)
-					sudokuDigit.setSafe(true);
-				
-			}
-		}
-		return false;
-	}
-	
-	// checks for solved digits in a column. Removes all the possible values of a sudokuDigit for solved digits
-	// if parameter isSafe=TRUE, sets any solved digits to isSafe=TRUE
-	// return false if the check removes all possible values without getting an answer
-	public boolean checkColumn(SudokuDigit sudokuDigit, boolean isSafe){
-		
-		int x = sudokuDigit.getXLocation();			
-		for (int y = 0; y < 9; y++){
-			if (sudokuDigit.getYLocation() != y){
-				if (table[x][y].isSolved()){
-					sudokuDigit.removePossibleValue(table[x][y].getAnswer());
-					if (sudokuDigit.isSolved() && sudokuDigit.getAnswer() == table[x][y].getAnswer())
-						return true;
-				}
-				if (sudokuDigit.isSolved() && isSafe)
-					sudokuDigit.setSafe(true);
-			}
-		}
-		return false;
-	}
-
-	// runs all checks in a loop until no more values can be solved
-	// if parameter isSafe=TRUE, sets any solved digits to isSafe=TRUE
-	// return false if all checks pass without getting an answer
-	public boolean checkAll(boolean isSafe){
-		int totalPossibleValues;
-		int previousTotalPossibleValues;
-		do {
-			totalPossibleValues = 0;
-			previousTotalPossibleValues = 0;
-			for (SudokuDigit[] column : table){
-				for (SudokuDigit sudokuDigit : column){
-					previousTotalPossibleValues += sudokuDigit.getPossibleValuesSize();
-					if (checkQuadrant(sudokuDigit, isSafe))
-						return true;
-					if (checkRow(sudokuDigit, isSafe))
-						return true;
-					if (checkColumn(sudokuDigit, isSafe))
-						return true;
-					totalPossibleValues += sudokuDigit.getPossibleValuesSize();
-				}
-			}
-		} while (totalPossibleValues < previousTotalPossibleValues);
-		return false;
-	}
-	
 	
 	//toString
 	public String toString(){
