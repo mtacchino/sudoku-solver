@@ -16,9 +16,9 @@ public class SudokuTableTest {
 		e.setTableNum(0);
 		SudokuTable sudokuTable = e.createExamplePuzzle();
 		
-		assertEquals(sudokuTable.getTable()[2][0].getAnswer(),5);
-		assertEquals(sudokuTable.getTable()[0][0].getAnswer(),9);
-		assertEquals(sudokuTable.getTable()[8][8].getAnswer(),5);
+		assertEquals(sudokuTable.getDigit(2,0).getAnswer(),5);
+		assertEquals(sudokuTable.getDigit(0,0).getAnswer(),9);
+		assertEquals(sudokuTable.getDigit(8,8).getAnswer(),5);
 	}
 
 	@Test

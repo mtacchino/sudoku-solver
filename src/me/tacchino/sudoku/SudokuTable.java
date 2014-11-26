@@ -24,9 +24,12 @@ public class SudokuTable {
 		}
 	}
 	
-	//get table
-	public SudokuDigit[][] getTable(){
-		return this.table;
+	//get a digit in the table
+	public SudokuDigit getDigit(int x, int y){
+		if (x >= 0 && x <= 8 && y >= 0 && y <= 8)
+			return table[x][y];
+		else
+			throw new IndexOutOfBoundsException("Table x and y values are integers from 0 to 8");
 	}
 	
 	
@@ -36,20 +39,20 @@ public class SudokuTable {
 		
 		 //check row
         for (int x = 0; x < 9; x++)
-            if (digit.getAnswer() == table[x][digit.getYLocation()].getAnswer() && digit.getXLocation() != x)
+            if (digit.getAnswer() == table[x][digit.getY()].getAnswer() && digit.getX() != x)
                 return false;
 
         //check column
         for (int y = 0; y < 9; y++) 
-            if (digit.getAnswer() == table[digit.getXLocation()][y].getAnswer() && digit.getYLocation() != y)
+            if (digit.getAnswer() == table[digit.getX()][y].getAnswer() && digit.getY() != y)
                 return false;
 
         //check quadrant
-        int startPosX = (digit.getXLocation()/3)*3;
-		int startPosY = (digit.getYLocation()/3)*3;
+        int startPosX = (digit.getX()/3)*3;
+		int startPosY = (digit.getY()/3)*3;
 		for (int y = startPosY; y < startPosY + 3; y++){
 			for (int x = startPosX; x < startPosX + 3; x++){
-				if (digit.getAnswer() == table[x][y].getAnswer() && digit.getXLocation() != x && digit.getYLocation() != y)
+				if (digit.getAnswer() == table[x][y].getAnswer() && digit.getX() != x && digit.getY() != y)
 					return false;
 			}
 		}
@@ -85,9 +88,9 @@ public class SudokuTable {
 	//returns an int (from 0 to 81) representing the number of digits that are solved in the table 
 	public int getNumOfDigitsSolved(){
 		int numOfDigitsSolved = 0;
-		for (SudokuDigit[] row : table){
-			for (SudokuDigit sudokuDigit : row){
-				if (sudokuDigit.getAnswer() != 0)
+		for (SudokuDigit[] column : table){
+			for (SudokuDigit sudokuDigit : column){
+				if (sudokuDigit.isSolved())
 					numOfDigitsSolved += 1;
 			}
 		}

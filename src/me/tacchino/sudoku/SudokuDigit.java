@@ -19,6 +19,11 @@ public class SudokuDigit {
 	private ArrayList<Integer> possibleValues = new ArrayList<Integer>();
 	private boolean isSafe = false;
 
+	//Constructor for when answer is known
+	SudokuDigit(int answer){
+		this.answer = answer;
+	}
+	
 	//Constructor for unknown digit. Set possible values to be all digits from 1 to 9
 	SudokuDigit(int xLocation, int yLocation){
 		for (int i = 0; i < 9; i++){
@@ -36,23 +41,11 @@ public class SudokuDigit {
 		this.possibleValues = sudokuDigit.possibleValues;
 		this.isSafe = sudokuDigit.isSafe;
 	}
-	
-	//Constructor for when answer is known
-	SudokuDigit(int answer){
-		this.answer = answer;
-	}
+
 	
 	//getters
 	public ArrayList<Integer> getPossibleValues(){
 		return possibleValues;
-	}
-	
-	public int getPossibleValues(int index){
-		return possibleValues.get(index);
-	}
-	
-	public int getPossibleValuesSize(){
-		return possibleValues.size();
 	}
 	
 	public boolean isSolved(){
@@ -67,11 +60,11 @@ public class SudokuDigit {
 		return answer;
 	}
 	
-	public int getXLocation(){
+	public int getX(){
 		return xLocation;
 	}
 	
-	public int getYLocation(){
+	public int getY(){
 		return yLocation;
 	}
 
@@ -81,32 +74,28 @@ public class SudokuDigit {
 	}
 	
 	public void setAnswer(int answer){
-			this.answer = answer;
-			possibleValues.clear();
-			if (answer == 0) { // add all possible values from 1 to 9
-				for (int i = 1; i < 10; i ++){
-					this.possibleValues.add(i);
-				}
-			}
+		this.answer = answer;
+		possibleValues.clear();
+		if (answer == 0) { // add all possible values from 1 to 9
+			for (int i = 1; i < 10; i ++)
+				this.possibleValues.add(i);
+		}
 	}
 
 	public void removePossibleValue(int possibleValue){
 		if (answer == 0) {
-			if (possibleValues.contains(possibleValue)){
+			if (possibleValues.contains(possibleValue))
 				possibleValues.remove(possibleValue);
-				if (possibleValues.size() == 1){
-					setAnswer(possibleValues.get(0));
-				}
-			}
+			if (possibleValues.size() == 1)
+				setAnswer(possibleValues.get(0));
 		}
 	}
 	
 	public String toString(){
 		if (answer == 0){
 			String str = "Possible values for location (" + xLocation + "," + yLocation + "): ";
-			for (int value : possibleValues){
+			for (int value : possibleValues)
 				str = str + value + " ";
-			}
 			return str;
 		}
 		else

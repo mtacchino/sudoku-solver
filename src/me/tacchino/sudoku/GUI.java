@@ -2,6 +2,7 @@ package me.tacchino.sudoku;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -20,7 +21,7 @@ import javax.swing.JTextField;
  * Author: Matt Tacchino
  * 
  * Creates the interactive GUI to support the sudoku solver using GridBagLayout.
- * GUI is minimum 300x300px resizable
+ * Frame is minimum 300x300px resizable
  * 
  * There are 5 main parts:
  * 		Title
@@ -36,7 +37,7 @@ public class GUI {
 	
 	private JFrame frame = new JFrame("Sudoku Solver");
 	private JTextField textField[][] = new JTextField[9][9];
-	private JPanel gridPanel = new JPanel(new GridLayout(9,9,1,1));
+	private GridPanel gridPanel = new GridPanel(new GridLayout(9,9,1,1));
 	
 	// constructor for blank SudokuTable. adds empty text fields to gridpanel
 	GUI(){
@@ -48,17 +49,35 @@ public class GUI {
 			}
 		}
 	}
+	
+	boolean checkText(){
+		for (int y = 0; y < 9; y++){
+			for (int x = 0; x < 9; x++){
+				if (!textField[x][y].getText().equals("")){
+					try {
+						int digit = Integer.parseInt(textField[x][y].getText());
+						if (digit <= 0 || digit >= 10)
+							return false;
+					}
+					catch (NumberFormatException e){
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
 
 	public void GUIToSudokuTable(){
 		for (int y = 0; y < 9; y++){
 			for (int x = 0; x < 9; x++){
 				if (!textField[x][y].getText().equals("")){
-					sudokuTable.getTable()[x][y].setAnswer(Integer.parseInt(textField[x][y].getText())); //if a number is in the textfield, put it in the sudoku table
-					sudokuTable.getTable()[x][y].setSafe(true); // set starting digits to true
+					sudokuTable.getDigit(x,y).setAnswer(Integer.parseInt(textField[x][y].getText())); //if a number is in the textfield, put it in the sudoku table
+					sudokuTable.getDigit(x,y).setSafe(true); // set starting digits to true
 					textField[x][y].setForeground(Color.RED); // colour starting digits red
 				}
 				else {
-					sudokuTable.getTable()[x][y].setAnswer(0); //clear any blank table digits by setting them to 0
+					sudokuTable.getDigit(x,y).setAnswer(0); //clear any blank table digits by setting them to 0
 					textField[x][y].setForeground(Color.BLACK); //colour blanks to black
 				}
 			}
@@ -68,8 +87,8 @@ public class GUI {
 	public void sudokuTableToGUI(){
 		for (int y = 0; y < 9; y++){
 			for (int x = 0; x < 9; x++){		
-				if (sudokuTable.getTable()[x][y].isSolved())
-					textField[x][y].setText(String.valueOf(sudokuTable.getTable()[x][y].getAnswer()));			
+				if (sudokuTable.getDigit(x,y).isSolved())
+					textField[x][y].setText(String.valueOf(sudokuTable.getDigit(x,y).getAnswer()));			
 			}
 		}
 	}
@@ -159,13 +178,17 @@ public class GUI {
 		mainPanel.add(solveButton, gridBagConstraints);
 		solveButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				GUIToSudokuTable();
-				if (!sudokuTable.checkOK())
-					JOptionPane.showMessageDialog(frame,"Invalid input. Puzzle cannot be solved.","Error",JOptionPane.ERROR_MESSAGE);
-				else if (!sudokuTable.solve(1))
-					JOptionPane.showMessageDialog(frame,"This puzzle cannot be solved.","Error",JOptionPane.ERROR_MESSAGE);
-				else
-					sudokuTableToGUI();
+				
+				//GUIToSudokuTable();
+				if (!checkText())
+					JOptionPane.showMessageDialog(frame,"Invalid input. Values must be integers from 1 to 9","Error",JOptionPane.ERROR_MESSAGE);
+				else {
+					GUIToSudokuTable();
+					if (!sudokuTable.solve(1))
+						JOptionPane.showMessageDialog(frame,"This puzzle cannot be solved.","Error",JOptionPane.ERROR_MESSAGE);
+					else
+						sudokuTableToGUI();
+				}
 			}
 		});
 		
@@ -177,6 +200,23 @@ public class GUI {
 		frame.setLocationRelativeTo(null);
 		frame.setMinimumSize(new Dimension(300,300));
 		frame.setVisible(true);
+	}
+	
+	/* Nested class for the grid panel used in the GUI */
+	public class GridPanel extends JPanel{
+		private static final long serialVersionUID = -6157041650150998205L;
+
+		GridPanel(GridLayout layout){
+			super(layout);
+		}
+		
+		//draw lines for 3x3 quardrants
+		public void paintComponent(Graphics g){
+			g.fillRect(getWidth()/3 - 1,0,3,getHeight());
+			g.fillRect(2*getWidth()/3 - 1,0,3,getHeight());
+			g.fillRect(0,getHeight()/3 - 1,getWidth(),3);
+			g.fillRect(0,2*getHeight()/3 - 2,getWidth(),3);
+		}
 	}
 	
 }
