@@ -178,8 +178,6 @@ public class GUI {
 		mainPanel.add(solveButton, gridBagConstraints);
 		solveButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				
-				//GUIToSudokuTable();
 				if (!checkText())
 					JOptionPane.showMessageDialog(frame,"Invalid input. Values must be integers from 1 to 9","Error",JOptionPane.ERROR_MESSAGE);
 				else {
