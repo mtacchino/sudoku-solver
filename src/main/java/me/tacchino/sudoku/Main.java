@@ -10,11 +10,9 @@ package me.tacchino.sudoku;
  * 
  * 
 */
-public class SudokuStart {
-	public static void main (String args[]){
+public class Main {
+	public static void main(String[] args) {
 		GUI gui = new GUI();
 		gui.createGUI();
 	}
 }
-
-

@@ -1,4 +1,5 @@
 package me.tacchino.sudoku;
+
 import java.util.ArrayList;
 
 /* Class representing a sudoku digit
@@ -19,22 +20,23 @@ public class SudokuDigit {
 	private ArrayList<Integer> possibleValues = new ArrayList<Integer>();
 	private boolean isSafe = false;
 
-	//Constructor for when answer is known
-	SudokuDigit(int answer){
+	// Constructor for when answer is known
+	SudokuDigit(int answer) {
 		this.answer = answer;
 	}
-	
-	//Constructor for unknown digit. Set possible values to be all digits from 1 to 9
-	SudokuDigit(int xLocation, int yLocation){
-		for (int i = 0; i < 9; i++){
-			possibleValues.add(i+1);
+
+	// Constructor for unknown digit. Set possible values to be all digits from 1 to
+	// 9
+	SudokuDigit(int xLocation, int yLocation) {
+		for (int i = 0; i < 9; i++) {
+			possibleValues.add(i + 1);
 		}
 		this.xLocation = xLocation;
 		this.yLocation = yLocation;
 	}
-	
-	//copy constructor
-	SudokuDigit(SudokuDigit sudokuDigit){;
+
+	// copy constructor
+	SudokuDigit(SudokuDigit sudokuDigit) {
 		this.answer = sudokuDigit.answer;
 		this.xLocation = sudokuDigit.xLocation;
 		this.yLocation = sudokuDigit.yLocation;
@@ -42,47 +44,46 @@ public class SudokuDigit {
 		this.isSafe = sudokuDigit.isSafe;
 	}
 
-	
-	//getters
-	public ArrayList<Integer> getPossibleValues(){
+	// getters
+	public ArrayList<Integer> getPossibleValues() {
 		return possibleValues;
 	}
-	
-	public boolean isSolved(){
+
+	public boolean isSolved() {
 		return (answer != 0);
 	}
-	
-	public boolean isSafe(){
+
+	public boolean isSafe() {
 		return isSafe;
 	}
-	
-	public int getAnswer(){
+
+	public int getAnswer() {
 		return answer;
 	}
-	
-	public int getX(){
+
+	public int getX() {
 		return xLocation;
 	}
-	
-	public int getY(){
+
+	public int getY() {
 		return yLocation;
 	}
 
-	//setters
-	public void setSafe(boolean isSafe){
+	// setters
+	public void setSafe(boolean isSafe) {
 		this.isSafe = isSafe;
 	}
-	
-	public void setAnswer(int answer){
+
+	public void setAnswer(int answer) {
 		this.answer = answer;
 		possibleValues.clear();
 		if (answer == 0) { // add all possible values from 1 to 9
-			for (int i = 1; i < 10; i ++)
+			for (int i = 1; i < 10; i++)
 				this.possibleValues.add(i);
 		}
 	}
 
-	public void removePossibleValue(int possibleValue){
+	public void removePossibleValue(int possibleValue) {
 		if (answer == 0) {
 			if (possibleValues.contains(possibleValue))
 				possibleValues.remove(possibleValue);
@@ -90,17 +91,16 @@ public class SudokuDigit {
 				setAnswer(possibleValues.get(0));
 		}
 	}
-	
-	public String toString(){
-		if (answer == 0){
-			String str = "Possible values for location (" + xLocation + "," + yLocation + "): ";
-			for (int value : possibleValues)
-				str = str + value + " ";
-			return str;
-		}
-		else
+
+	@Override
+	public String toString() {
+		if (answer == 0) {
+			StringBuilder str = new StringBuilder("Possible values for location (" + xLocation + "," + yLocation + "): ");
+			for (int value : possibleValues) {
+				str.append(value).append(" ");
+			}
+			return str.toString();
+		} else
 			return "Answer for location (" + xLocation + "," + yLocation + "): " + answer;
 	}
 }
-
-
