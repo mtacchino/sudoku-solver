@@ -17,7 +17,7 @@ public class SudokuDigit {
 	private int answer;
 	private int xLocation;
 	private int yLocation;
-	private ArrayList<Integer> possibleValues = new ArrayList<Integer>();
+	private ArrayList<Integer> possibleValues = new ArrayList<>();
 	private boolean isSafe = false;
 
 	// Constructor for when answer is known
@@ -95,7 +95,8 @@ public class SudokuDigit {
 	@Override
 	public String toString() {
 		if (answer == 0) {
-			StringBuilder str = new StringBuilder("Possible values for location (" + xLocation + "," + yLocation + "): ");
+			StringBuilder str = new StringBuilder(
+					"Possible values for location (" + xLocation + "," + yLocation + "): ");
 			for (int value : possibleValues) {
 				str.append(value).append(" ");
 			}
